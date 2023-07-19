@@ -1,3 +1,8 @@
+# TERMINAL: python -m
+
+# GOAL:
+################################################################################################
+
 import requests
 import json
 from datetime import datetime as dt

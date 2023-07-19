@@ -1,3 +1,6 @@
+-- # GOAL:
+-- ################################################################################################
+
 -- I'm anticipating tx_state_diff to have ~7B rows in total, so going to assume ~1B rows for this table (7x per address)
 
 CREATE TABLE IF NOT EXISTS public.contract_storage

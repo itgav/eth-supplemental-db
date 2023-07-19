@@ -1,5 +1,8 @@
+# GOAL
+
 # TO DO
 
+- scrape price data
 - create a file that creates outline DB creation, and then table creation
   - I manually created the DB in PGAdmin but the table was created w/ code
 - ERC20, 721, etc contract ABIs in a folder to reference when to circumvent proxy contracts
@@ -16,24 +19,32 @@
 - refactor scrapers, especially the etherscan scrape
 - analyze etherscan token scrape data to figure out best way to parse/refactor and then insert into DB
 - etherscan scape --> need to excel filter file
-- DB script files for the web scrapers
 - uniform naming for csv file folders and scraping files
-- uniform naming for db_tables files
-- delete cookie file
 - add DB upload as part of etherscan and 4 bytes if not already
 - remove unused imports
 - remove duplicate or unused functions
-- convert SQL files into Python scripts
-- rename SQL files
+- go through all files
+- finalize SQL for remove duplicate key
 - add file to create 'blockchain' database
 - can you partition a table after the fact? what happens if outside of defined partitions?
-- 1 file to create all the SQL tables
 - 'latest' block not working, try syncing node and then re-try
+- terminal, goals, summaries for all code
+- annotate all code
+- to TO_DO add next steps in supplement_db and where the data sources are:
+  - CEX APIs or Kaggle files
+  - de-anonymized data
+  - etc
+- change all file paths in files to be dynamic or parameterize
+- parameterize functions --> args, kwargs, etc
+- make a single file to do both of these files' jobs: 'missing log data' 'logs data'
+  - same with the 'tx_data' scrapes
+- use multiprocessing/multithreading for all 'scrape_blockchain' files. Right now only used for 'state_and_slots'
+- need to look into how to have a private .env file or need to remove some variables from there.
+  - could just make a variables file
+- the 'db_missing_ids' function in 'utility_scrape' could probably be made more efficient by making the DB results a set and then subtracting from itertools.chain --> similar to 'db_missing_blocks' in 'scraping_missing_logs'
 
 ## Database
 
-- delete old folders/files
-- delete old 'tx_data' db table since we have 'tx_data_part'
 - eventually add a 'currency' table with columns:
   - UID
   - token abbreviation

@@ -1,4 +1,7 @@
-# terminal: python -m scrape_web.fourbytes_scrape.scrape_4bytes
+# TERMINAL: python -m scrape_web.fourbytes_scrape.scrape_4bytes
+
+# GOAL:
+################################################################################################
 
 import time
 import psycopg2

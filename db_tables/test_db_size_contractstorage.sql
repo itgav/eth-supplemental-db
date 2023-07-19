@@ -1,3 +1,6 @@
+-- # GOAL:
+-- ################################################################################################
+
 -- contract_storage
 -- table desc: this will hold all balance storage_slots that have been linked to a specific wallet
 -- columns:

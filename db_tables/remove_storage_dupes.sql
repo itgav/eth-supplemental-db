@@ -1,3 +1,6 @@
+-- # GOAL:
+-- ################################################################################################
+
 -- can have full duplicates and more than 1 'wallet_address' linked to a contract's 'storage_slot'
 -- 	- full duplicates: remove all but 1
 -- 	- non-unique 'storage_slot': remove all but 1 for each wallet, create a count of wallet's with occupying the 'storage_slot'

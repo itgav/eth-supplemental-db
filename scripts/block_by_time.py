@@ -1,4 +1,7 @@
-# terminal: python -m scripts.block_by_time
+# TERMINAL: python -m scripts.block_by_time
+
+# GOAL:
+################################################################################################
 
 from datetime import datetime as dt
 from scripts.utility_misc import get_block_info

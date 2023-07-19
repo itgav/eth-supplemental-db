@@ -1,3 +1,6 @@
+-- # GOAL:
+-- ################################################################################################
+
 CREATE TABLE IF NOT EXISTS public.event_signature
 (
 	hex_signature text NOT NULL CHECK (LENGTH(hex_signature) = 66),

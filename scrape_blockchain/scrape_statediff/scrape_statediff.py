@@ -1,4 +1,7 @@
-# terminal: python -m scrape_blockchain.add_state_and_slots
+# TERMINAL: python -m scrape_blockchain.add_state_and_slots
+
+# GOAL:
+################################################################################################
 
 # SUMMARY
 #############################################################################################

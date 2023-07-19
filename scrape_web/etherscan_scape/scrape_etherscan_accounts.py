@@ -1,3 +1,8 @@
+# TERMINAL: python -m
+
+# GOAL:
+################################################################################################
+
 import time
 import emoji  # need to remove emojis from text to add to CSV (ex: Alchemy token)
 from selenium import webdriver
@@ -5,8 +10,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager  # handles driver download and auto-reference
-from ..site_cookies.cookie_functions import load_cookie  # used to auto-login
-from .scrape_data_helper import write_csv, append_csv
+from site_cookies.cookie_functions import load_cookie  # used to auto-login
+from scripts.utility_scrape import write_csv, append_csv
 
 
 # to do:

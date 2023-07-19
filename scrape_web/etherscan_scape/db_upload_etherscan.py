@@ -1,4 +1,7 @@
-# terminal: python -m scripts.db_upload_etherscan
+# TERMINAL: python -m scripts.db_upload_etherscan
+
+# GOAL:
+################################################################################################
 
 import os
 import psycopg2

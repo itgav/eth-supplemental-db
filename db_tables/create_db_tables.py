@@ -1,11 +1,12 @@
+# TERMINAL: python -m db_tables.create_db_tables
+
+# GOAL:
+################################################################################################
+# Create the tables for your local PostgreSQL database
+# These tables will later be populated from data scraped from the web and from your node
+
 import os
-from scripts.utility_misc import env_var
 from scripts.utility_db_admin import create_db_table
-
-
-db_name = env_var("DB_NAME")
-db_user = env_var("DB_USER")
-db_password = env_var("DB_PASSWORD")
 
 
 def main():

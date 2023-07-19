@@ -1,3 +1,8 @@
+# TERMINAL: python -m
+
+# GOAL:
+################################################################################################
+
 import psycopg2
 import json
 import csv
@@ -46,29 +51,35 @@ def delete_db_table_data(table_name):
     # ... 'TRUNCATE' is faster than 'DELETE' -> delete allows use of 'WHERE' but truncate does not
     con = psycopg2.connect(database=db_name, user=db_user, password=db_password)
     cur = con.cursor()
-    cur.execute(f"TRUNCATE {table_name}")
-    con.commit()
-    cur.close()
-    con.close()
+    try:
+        cur.execute(f"TRUNCATE {table_name}")
+    finally:
+        con.commit()
+        cur.close()
+        con.close()
 
 
 # if column name is text, need to encase in quotes and encase with apostrophes (ex: "'text_name'")
 def db_add_column(table_name, column_name, column_dtype):
     con = psycopg2.connect(database=db_name, user=db_user, password=db_password)
     cur = con.cursor()
-    cur.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_dtype}")
-    con.commit()
-    cur.close()
-    con.close()
+    try:
+        cur.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_dtype}")
+    finally:
+        con.commit()
+        cur.close()
+        con.close()
 
 
 def db_update_column_value(table_name, column_name, extra_code):
     con = psycopg2.connect(database=db_name, user=db_user, password=db_password)
     cur = con.cursor()
-    cur.execute(f"UPDATE {table_name} SET {column_name} = {extra_code}")
-    con.commit()
-    cur.close()
-    con.close()
+    try:
+        cur.execute(f"UPDATE {table_name} SET {column_name} = {extra_code}")
+    finally:
+        con.commit()
+        cur.close()
+        con.close()
 
 # def import_csv_to_db(connection, cursor, csv_path, db_table):
 #     # import csv data to database
@@ -104,77 +115,6 @@ def import_csv_to_db(connection, cursor, csv_path, db_schema_table):
         connection.close()
         print(x_exception)
         return [import_success, x_exception]
-
-
-# get data in csv and remove row if there's already the data in the database --> returns a list to then be written to a CSV
-def remove_duplicate_key(x_exception, relative_path, csv_name, db_table):
-    csv_data = []
-    if x_exception.pgcode == "23505":  # code for 'UniqueViolation':
-        # parse hex_signature and row number of CSV from the error message
-        parse = x_exception.pgerror.split("(hex_signature)=(")[1].split(") already exists")
-        duplicate_signature = parse[0]
-        line_number = parse[1].split("line ")[1].replace("\n", "")
-
-        # check to see if parsing makes sense
-        signature_length = json.loads(env_var("LEN_SIGNATURE"))[db_table]
-        signature_bool = len(duplicate_signature) == signature_length
-        try:
-            line_number = int(line_number)
-            line_number_bool = True
-        except:
-            # print("ERROR in Parsing: line number cannot be converted to type 'int'")
-            line_number_bool = False
-
-        # if parsing made sense then continue
-        if signature_bool is True and line_number_bool is True:
-            # get data from CSV file and put into a list called 'csv_data'
-            with open(f"{relative_path}/{csv_name}.csv", "r") as csvfile:
-                csv_data = list(csv.reader(csvfile))
-
-            # see if duplicate matches by line number and if so, remove the duplicate from the list
-            duplicate_signature_csv = csv_data[line_number - 1][0]  # just grab value for hex_signature column
-            if duplicate_signature == duplicate_signature_csv:
-                csv_data.pop(line_number - 1)
-            else:
-                print("ERROR: hex_signature from error message didn't match hex_signature retrieved from CSV")
-
-        else:
-            print(f"ERROR in parsing. Signature bool: {signature_bool}, Line number bool: {line_number_bool}")
-    else:
-        print(f"exception doesn't match 'UniqueViolation'. Exception: {x_exception}")
-
-    return csv_data
-
-
-# differs from above:
-#   - less checks
-# get data in csv and remove row if there's already the data in the database --> returns a list to then be written to a CSV
-def remove_dup_key(x_exception, relative_path):
-    csv_data = []
-    parse_success = False
-    if x_exception.pgcode == "23505":  # code for 'UniqueViolation':
-        # parse row number of CSV duplicate data from the error message
-        line_number = x_exception.pgerror.split("line ")[1].replace("\n", "")
-        try:
-            line_number = int(line_number)
-            line_number_bool = True
-        except:
-            print("ERROR in Parsing: line number cannot be converted to type 'int'")
-            line_number_bool = False
-
-        # if parsing made sense then continue
-        if line_number_bool is True:
-            # get data from CSV file and put into a list called 'csv_data'
-            with open(relative_path, "r") as csvfile:
-                csv_data = list(csv.reader(csvfile))
-            csv_data.pop(line_number - 1)
-            parse_success = True
-        else:
-            print(f"ERROR in parsing. {line_number_bool = }")
-    else:
-        print(f"exception doesn't match 'UniqueViolation'. Exception: {x_exception}")
-
-    return [parse_success, csv_data]
 
 
 if __name__ == "__main__":

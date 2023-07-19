@@ -1,3 +1,8 @@
+# TERMINAL: python -m
+
+# GOAL:
+################################################################################################
+
 # Used to go to a website, manually log-in, and then save the cookies for the log-in credentials
 # ^^^ then can load cookies in a scraping script so that you don't have to re-login with the selenium browser
 

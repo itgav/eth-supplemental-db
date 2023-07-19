@@ -1,3 +1,6 @@
+-- # GOAL:
+-- ################################################################################################
+
 -- tx_state_diff
 -- table desc: this will hold all the addresses and their resulting statediff from each tx
 	-- many:1 relationship between # rows and tx_hash

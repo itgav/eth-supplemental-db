@@ -1,4 +1,7 @@
-# terminal: python -m scrape_blockchain.add_to_tx_data
+# TERMINAL: python -m scrape_blockchain.add_to_tx_data
+
+# GOAL:
+################################################################################################
 
 import time
 import csv
@@ -11,8 +14,8 @@ db_name = env_var("DB_NAME")
 db_user = env_var("DB_USER")
 db_password = env_var("DB_PASSWORD")
 
-# schema_table = "public.tx_data"
-schema_table = "public.tx_data_part"
+schema_table = "public.tx_data"
+# schema_table = "public.tx_data_part"
 
 # completed:
 # 0-1000000

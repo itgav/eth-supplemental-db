@@ -1,3 +1,8 @@
+# TERMINAL: python -m
+
+# GOAL:
+################################################################################################
+
 import psycopg2
 from scripts.utility_misc import env_var
 
@@ -13,15 +18,18 @@ def main():
 
 # query data from DB --> doesn't work if you need to loop
 def db_fetch_data(sql_script):
+    queried_data = None
     # Connect to DB
     con = psycopg2.connect(database=db_name, user=db_user, password=db_password)
     cur = con.cursor()
     # Execute query
-    cur.execute(sql_script)
-    queried_data = cur.fetchall()
+    try:
+        cur.execute(sql_script)
+        queried_data = cur.fetchall()
     # close DB connection
-    cur.close()
-    con.close()
+    finally:
+        cur.close()
+        con.close()
 
     return queried_data
 

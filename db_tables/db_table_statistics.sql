@@ -1,3 +1,6 @@
+-- # GOAL:
+-- ################################################################################################
+
 SELECT l.metric, l.nr AS bytes
      , CASE WHEN is_size THEN pg_size_pretty(nr) END AS bytes_pretty
      , CASE WHEN is_size THEN nr / NULLIF(x.ct, 0) END AS bytes_per_row

@@ -1,12 +1,13 @@
-# terminal: python -m scrape_blockchain.add_missing_log_data
+# TERMINAL: python -m scrape_blockchain.add_to_logs_data
+
+# GOAL:
+################################################################################################
 
 import time
 import csv
 import psycopg2
-import itertools
 
 from scripts.utility_misc import env_var, node_rpc_command
-from scripts.utility_db import db_fetch_data
 
 
 db_name = env_var("DB_NAME")
@@ -15,95 +16,73 @@ db_password = env_var("DB_PASSWORD")
 
 schema_table = "public.tx_logs"
 
-# completed:
+# completed blocks:
 
 
 def main():
     # highest_block = int(node_rpc_command("eth_getBlockByNumber", "latest", False)["result"]["number"], 16)
-    master_add_tx_to_db(14000000, 16252285, 200000, 200)
+    master_add_tx_to_db(14000000, 16252285, 50, 200)
 
 
-def master_add_tx_to_db(start_block, end_block, db_query_threshold, upload_threshold):
+def master_add_tx_to_db(start_block, end_block, block_dict_treshold, block_upload_threshold):
     blocks_in_csv = 0
-    # holds the missing DB blocks -> 'blocks_to_get' are the 'upload_threshold' blocks subset of 'blocks_to_add'
-    blocks_to_add = []
-    blocks_to_get = []  # holds the blocks that we are querying to then upload to DB
     while start_block <= end_block:
-        upload_threshold = min(upload_threshold, (end_block - start_block) + 1)
-        print(f"start block: {start_block}, end block: {end_block}, upload threshold: {upload_threshold}")
-        print("Get missing blocks")
-        if blocks_to_add == []:
-            blocks_to_add = db_missing_blocks(start_block, min(db_query_threshold, end_block - start_block))
-            block_end_range = start_block + db_query_threshold
-        if blocks_to_add != []:
-            x_threshold = min(upload_threshold, len(blocks_to_add))
-            blocks_to_get = blocks_to_add[:x_threshold]
-            blocks_to_add = list(set(blocks_to_add) - set(blocks_to_get))
-            print("Get tx data into dictionary")
+        block_dict_treshold = min(block_dict_treshold, (end_block - start_block) + 1)
+        print(f"start block: {start_block}, end block: {end_block}, block dict threshold: {block_dict_treshold}")
+        print("Get log data into dictionary")
+        try:
+            log_dict = get_log_data(start_block, block_dict_treshold)
+        except Exception as x_exception:
+            # typically due to RPC connection so will wait and then try again
+            print(f"ERROR in 'get_log_data' {x_exception}")
+            time.sleep(10)
             try:
-                log_dict = get_log_data(blocks_to_get)
+                log_dict = get_log_data(start_block, block_dict_treshold)
             except Exception as x_exception:
-                print(f"ERROR in 'get_tx_data' {x_exception}")
-                time.sleep(10)
-                try:
-                    log_dict = get_log_data(blocks_to_get)
-                except Exception as x_exception:
-                    print(f"ERROR in 2nd attempt 'get_tx_data' at start block: {start_block}")
-                    print(f"ERROR in 2nd attempt 'get_tx_data' {x_exception}")
-            time.sleep(0.1)
+                print(f"ERROR in 2nd attempt 'get_log_data' at start block: {start_block}")
+                print(f"ERROR in 2nd attempt 'get_log_data' {x_exception}")
+        time.sleep(0.1)
 
-            # if csv is empty or fully uploaded then write to a new csv
-            if blocks_in_csv == 0:
-                op_symbol = "w"
-            else:  # append data to current working csv
-                op_symbol = "a"
-            print(f"op symbol: {op_symbol}")
-            # add data in dictionary to CSV file that will later be uploaded
-            # add_tx_to_csv(relative_path, file_name, data, op_symbol)
-            print("Add log dict to CSV")
-            path_to_csv = add_log_to_csv(
-                "./eth_trader_profit/tx_database/csv_files_blockchain/", "log_data_grab", log_dict, op_symbol
-            )
-            blocks_in_csv += upload_threshold
-            time.sleep(0.1)
+        # if csv is empty or fully uploaded then write to a new csv
+        if blocks_in_csv == 0:
+            op_symbol = "w"
+        else:  # append data to current working csv
+            op_symbol = "a"
+        print(f"op symbol: {op_symbol}")
+        # add data in dictionary to CSV file that will later be uploaded
+        # add_log_to_csv(relative_path, file_name, data, op_symbol)
+        print("Add log dict to CSV")
+        path_to_csv = add_log_to_csv(
+            "./eth_trader_profit/tx_database/csv_files_blockchain/", "log_data_grab", log_dict, op_symbol
+        )
+        blocks_in_csv += block_dict_treshold
+        time.sleep(0.1)
 
-            # # once reach upload threshold or at the final block, then upload CSV file to the db
-            # if blocks_in_csv >= block_threshold or start_block + block_threshold >= end_block:
+        # once reach upload threshold or at the final block, then upload CSV file to the db
+        if blocks_in_csv >= block_upload_threshold or start_block + block_dict_treshold >= end_block:
             print("Upload CSV")
             try:
                 con = psycopg2.connect(database=db_name, user=db_user, password=db_password)
                 cur = con.cursor()
-                # add_tx_to_db(connection, cursor, csv_path, db_schema_table)
+                # add_log_to_db(connection, cursor, csv_path, db_schema_table)
                 add_log_to_db(con, cur, path_to_csv, schema_table)
                 blocks_in_csv = 0
             except Exception as x_exception:
                 print(f"ERROR adding CSV to DB: {x_exception}")
                 cur.close()
                 con.close()
-                time.sleep(0.3)
-            else:
-                pass
-
-        if blocks_to_add == []:
-            start_block = block_end_range
+            time.sleep(0.3)
         else:
             pass
 
-
-def db_missing_blocks(start_block, block_increment):
-    end_block = start_block + block_increment
-    sql_script = f"SELECT DISTINCT(block_number) FROM {schema_table} WHERE block_number >= {start_block} AND block_number < {end_block}"
-    db_blocks = db_fetch_data(sql_script)
-    db_blocks = set(itertools.chain(*db_blocks))
-    missing_blocks = list(set(x for x in range(start_block, end_block)) - db_blocks)
-    return missing_blocks
+        start_block += block_dict_treshold
 
 
-def get_log_data(missing_blocks):
+def get_log_data(start_block, block_increment):
     tx_log_data = {}
     # for every block, for each tx in the block add the relevant data to the 'tx_log_data' dictionary.
     # ... this dict will later be added to a CSV which is then uploaded to the DB
-    for block_no in missing_blocks:
+    for block_no in range(start_block, start_block + block_increment):
         # get log data and add to dictionary
         block_receipts = node_rpc_command("eth_getBlockReceipts", block_no)["result"]
         for receipt in block_receipts:

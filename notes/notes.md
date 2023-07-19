@@ -1,3 +1,5 @@
+# GOAL
+
 - added "source" column to DB after the fact
 - for the second scrape of 4bytes (to fill in DB data) to get the "old ungotten records", am going to start from end of DB and then scrape until end of website.
   - am doing this instead of, end of website to end of DB because if our scrape for some reason is unsuccessful, there will still be a contiguous piece from end of DB to end of website.

@@ -1,3 +1,8 @@
+# TERMINAL: python -m
+
+# GOAL:
+################################################################################################
+
 import time
 import emoji  # need to remove emojis from text to add to CSV (ex: Alchemy token)
 from selenium import webdriver

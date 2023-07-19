@@ -1,3 +1,6 @@
+-- # GOAL:
+-- ################################################################################################
+
 CREATE TABLE IF NOT EXISTS public.wallet_info
 (
 	wallet_address text NOT NULL CHECK (LENGTH(wallet_address) = 42),
