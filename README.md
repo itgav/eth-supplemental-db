@@ -12,4 +12,4 @@
 
 ### STEPS
 
-- in the process of refactoring... will be refactored soon.
+- Needs to be refactored but other items have taken priority
